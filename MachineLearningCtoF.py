@@ -1,14 +1,14 @@
 import numpy as np
 
 NUM_CHILDREN = 2
-generation = 0
-scores_moving_avg = [0] * 10
+generation = 0  # for debugging
+scores_moving_avg = [0] * 10  #for debugging 
 delta_score = 0
-delta_scores_avg = [0] * 10
-CtoF = []
+delta_scores_avg = [0] * 10  #estimates stagnation
+CtoF = []  #best scores from each generation
 SPECIMINS_PER_GEN = 100
 genetic_pool = []
-df = 100
+df = 100  #dision factor larger value results in smaller changes.
 
 TRAINING_DATA =[
 (8, 46.4),
@@ -214,9 +214,6 @@ TRAINING_DATA =[
 (18, 64.4),
 ]
 
-# def sigmoid(x):
-#   return 1/(1+ np.pow(2.71828182845, -x))
-
 
 class genetic_specimin:
   def __init__(self,second_order,first_order,constant):
@@ -229,7 +226,7 @@ class genetic_specimin:
 
   def make_guess(self,cell):
     output = (self.second_order*cell*cell) + (self.first_order*cell) + self.constant
-    #output = self.first_order*cell + self.constant
+    #output = self.first_order*cell + self.constant # Was used for debugging as old code avoided hitting term = 0 
     return output
 
   def ask(self):
@@ -240,13 +237,21 @@ class genetic_specimin:
     global df # division factor used when making children
 
     gen_score = index/SPECIMINS_PER_GEN #0-1 score relative to this generation
-    abs_score = self.score/df  #absolute score
-    scale = gen_score * abs_score #caching for efficency
+    abs_score = self.score/df  #absolute score (lower is better)
+    scale = gen_score * abs_score  #caching for efficency and readablity
+    def child_terms(term):  #local func reduces amount to type.
+      return term + (
+        np.random.random()  #random number 0-1
+       * np.random.choice([1,-1])  #randomly add or subtract
+       * scale  # makes change smaller the better score we get
+       * abs(np.tanh(term))  #allows us to get closer to zero
+      )  
+      # a tansig function would be more performant
+
+    child_2o = child_terms(self.second_order)
+    child_1o = child_terms(self.first_order)
+    child_const = child_terms(self.constant)
     
-    #child_2o = self.second_order + (np.random.random() * np.random.choice([1,-1]) * scale)
-    child_2o = 0
-    child_1o = self.first_order + (np.random.random() * np.random.choice([1,-1]) * scale)
-    child_const = self.constant + (np.random.random() * np.random.choice([1,-1]) * scale)
     return (child_2o, child_1o , child_const)
 
 def test_specimin(subject):
@@ -266,7 +271,6 @@ def initalisation():
     first_order = np.random.randint(100)
     constant = np.random.randint(100)
     genetic_pool.append(genetic_specimin(second_order, first_order, constant))
-    # print("created specimin " + str(specimin) +":"+" "+second_order+","+first_order+" "+constant)
     # print("created specimin {id} : {x} {y} {z}".format(id = specimin, x = second_order, y = first_order, z =constant))
     return None
 
@@ -298,9 +302,9 @@ def simulate_generation(genetic_pool):
     #score them
     subject.score = score_worst_guess(subject) #===choose scoreing method
     scores_this_round.append(subject.score)
-    #print("  {x}".format( x = subject.score) )
+   
   
-  #scores_last_round = 0
+
   global generation 
   global delta_score 
   print("round average: {x}  d:{d}  gen: {gen}".format(x= round(np.average(scores_this_round),3), d= round(delta_score, 4 ), gen= generation )) 
@@ -314,7 +318,7 @@ def simulate_generation(genetic_pool):
   # Flipiing back and forth generally means the random scale is too high
     # This guesses when it stagnates and increases the division factor
     # guessing stagnation should be done with differentiation 
-  if ((np.sum(delta_scores_avg)>4) & (generation > 10)):
+  if ((np.sum(delta_scores_avg)>5) & (generation > 10)):
     df += 1 
       # only one to avoid random mistakes, 
       # also due to moving avg method, 2-3 are added in a burst
@@ -330,7 +334,8 @@ def simulate_generation(genetic_pool):
   #print("alive: {}".format(len(genetic_pool)))
   CtoF.append(genetic_pool[0]) # record the best form each generation
 
-  def calculate_variance():
+  def calculate_variance(): 
+    # curently unused, the idea was to use variance in reproduction
     second_orders = []
     first_orders = []
     constants = []
@@ -359,16 +364,10 @@ def simulate_generation(genetic_pool):
       children.append(genetic_specimin(x[0],x[1],x[2]))
     genetic_pool.remove(subject)
   
-    
-    # x = subject.reproduce(index +1)
-    # children.append(genetic_specimin(x[0],x[1],x[2]))
-    # y = subject.reproduce(index +1)
-    # children.append(genetic_specimin(y[0],y[1],y[2]))
-    # genetic_pool.remove(subject)
   
   genetic_pool+=children # let them grow up
   #print(len(children))
-  generation += 1
+  generation += 1 #for debugging and visualisation, not used in code.
   return(genetic_pool)
 
 def generations(genetic_pool, n):
@@ -380,7 +379,7 @@ def generations(genetic_pool, n):
 def main():
   global genetic_pool
   genetic_pool = generations(genetic_pool,200)
-  print("simulation done")
+  print("simulation done")  
   return None
 
 if __name__ == "__main__" :
