@@ -11,6 +11,7 @@ genetic_pool = [] #global for convience and defaults
 df = 50  #dision factor larger value results in smaller changes.
 delta_score_avg = [-1] * 10
 
+# Training data added to this file for ease of reading
 TRAINING_DATA =[
 (8, 46.4),
 (86, 186.8),
