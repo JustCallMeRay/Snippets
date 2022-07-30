@@ -1,7 +1,9 @@
 # A teaching experiance about machine learning I and two others worked on during a Bristol CodeHub meet.
   # code uses machine learning to approach a curve with x**2, x and c coefficents, 
   # the model is trained via a genetic method 
-   
+    # scores get worse untill generation 10 - 15, im not sure why, 
+    # I assume its something to do with the scoring as the moving average arrays are populated during those generations
+  
   
 ####   NOTICE   ####
   # If running the code please change file name to "main.py" otherwise it wont run, 
