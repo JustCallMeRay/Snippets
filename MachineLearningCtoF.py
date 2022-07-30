@@ -1,21 +1,28 @@
+# A teaching experiance about machine learning I and two others worked on during a Bristol CodeHub meet.
+  # code uses machine learning to approach a curve with x**2, x and c coefficents, 
+  # the model is trained via a genetic method 
+   
+  
+####   NOTICE   ####
+  # If running the code please change file name to "main.py" otherwise it wont run, 
+
 import numpy as np
 
-NUM_CHILDREN = 3
+NUM_CHILDREN = 3  #const
 generation = 0  # for debugging
-scores_moving_avg = [3854147.4] * 10  #for debugging 
-#delta_score = -1
+scores_moving_avg = [3854147.4] * 10  #for debugging, high number is average score after initilisation
 stag_avg = [-1] * 15  #estimates stagnation
 CtoF = []  #best scores from each generation
-SPECIMINS_PER_GEN = 90
+SPECIMINS_PER_GEN = 90  #const
 genetic_pool = [] #global for convience and defaults
-df = 50  #dision factor larger value results in smaller changes.
+df = 15  #dision factor larger value results in smaller changes.
 delta_score_avg = [-1] * 10
 
-# Training data added to this file for ease of reading
-TRAINING_DATA =[
+#Training data included here for ease of reading, created via script 
+  # Data corelates to celcius to fareinheit conversions
+TRAINING_DATA = [
 (8, 46.4),
 (86, 186.8),
-(49, 120.2),
 (49, 120.2),
 (92, 197.6),
 (87, 188.6),
@@ -30,7 +37,6 @@ TRAINING_DATA =[
 (37, 98.60000000000001),
 (65, 149.0),
 (3, 37.4),
-(92, 197.6),
 (52, 125.60000000000001),
 (81, 177.8),
 (32, 89.6),
@@ -139,7 +145,6 @@ TRAINING_DATA =[
 (35, 95.0),
 (35, 95.0),
 (176, 348.8),
-(3, 37.4),
 (68, 154.4),
 (72, 161.6),
 (47, 116.60000000000001),
@@ -165,12 +170,10 @@ TRAINING_DATA =[
 (88, 190.4),
 (126, 258.8),
 (117, 242.6),
-(3, 37.4),
 (4, 39.2),
 (16, 60.8),
 (143, 289.40000000000003),
 (12, 53.6),
-(3, 37.4),
 (143, 289.40000000000003),
 (6, 42.8),
 (55, 131.0),
@@ -248,6 +251,10 @@ class genetic_specimin:
        * abs(np.tanh(1.5*term))  #allows us to get closer to zero
       )  
       # a tansig function would be more performant
+      # a better scoring system can use score/cell**2 to scale second_order
+        # (score/cell**2)/ cell for  first order 
+        # and score % cell for const
+          # this also helps the activation function allow terms to be zero 
 
     child_2o = child_terms(self.second_order)
     child_1o = child_terms(self.first_order)
@@ -263,8 +270,8 @@ def test_specimin(subject):
     results.append(correct_answer - guess)
   return results
 
-def initalisation(genetic_pool_l = genetic_pool):
-  # spawn seed specimins
+def initalisation(genetic_pool_l = []):
+  # spawn seed specimin
   print("inital creation:")
   for specimin in range(SPECIMINS_PER_GEN):
     second_order = np.random.randint(100)
@@ -305,11 +312,11 @@ def simulate_generation(genetic_pool_l = genetic_pool):
   global generation 
   # if 'generation' not in locals():
   #global delta_score_avg
-  #global stag_avg
+  global stag_avg
   
   delta_score = np.average(scores_this_round) - np.average(scores_moving_avg)
   scores_moving_avg[generation % len(scores_moving_avg)] = np.average(scores_this_round)
-  stag_avg [ generation % len(stag_avg) ] = (delta_score > 0)
+  stag_avg[ generation % len(stag_avg) ] = (delta_score > 0)
   delta_score_avg[generation % len(delta_score_avg)] = delta_score
   
   print("round average: {x}  d:{d}  gen: {gen}".format(
@@ -323,12 +330,13 @@ def simulate_generation(genetic_pool_l = genetic_pool):
     # This guesses when it stagnates and increases the division factor
     # guessing stagnation should be done with differentiation 
   if (
-    (np.sum(stag_avg) > (0.3*len(stag_avg))) 
-    & (abs(np.average(delta_score_avg)) < 100)
+    (np.sum(stag_avg) > (0.3 * len(stag_avg))) 
+    & (abs(np.average(delta_score_avg)) < 50)
   ):
     df += 1 
+    stag_avg = [0] * len(stag_avg)
       # only one to avoid random mistakes, 
-      # also due to moving avg method, several are added in bursts
+      
     print("DivisionFactor increased")
 
   
@@ -400,6 +408,4 @@ def main(n = 50, genetic_pool_local = genetic_pool):
   return genetic_pool_local
 
 if __name__ == "__main__" :
-  #global genetic_pool
-  genetic_pool = initalisation(genetic_pool)
-  main()
+  My_genetic_pool = main(50, initalisation())
