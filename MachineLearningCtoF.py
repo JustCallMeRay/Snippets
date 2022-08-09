@@ -5,17 +5,15 @@
     # I assume its something to do with the scoring as the moving average arrays are populated during those generations
   
   
-####   NOTICE   ####
-  # If running the code please change file name to "main.py" otherwise it wont run, 
 
 import numpy as np
 
-NUM_CHILDREN = 3  #const
-generation = 0  # for debugging
-scores_moving_avg = [3854147.4] * 10  #for debugging, high number is average score after initilisation
-stag_avg = [-1] * 15  #estimates stagnation
-CtoF = []  #best scores from each generation
-SPECIMINS_PER_GEN = 90  #const
+NUM_CHILDREN = 3  
+generation = 0  # for debugging and visualisation only
+scores_moving_avg = [3854147.4] * 10  #for debugging, high number is an average score after initilisation, avoids errors
+stag_avg = [-1] * 15  #estimates stagnation (if a local minima(/maxima) is found we can try to step out of it. 
+CtoF = []  #best scores from each generation, for use in end program.
+SPECIMINS_PER_GEN = 90  #const, 
 genetic_pool = [] #global for convience and defaults
 df = 15  #dision factor larger value results in smaller changes.
 delta_score_avg = [-1] * 10
