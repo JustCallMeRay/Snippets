@@ -21,7 +21,7 @@ delta_score_avg = [-1] * 10
 
 #Training data not included here for ease of reading, created via script 
   # Data corelates to celcius to fareinheit conversions,
-  # Was included in a previous commit if you are interested.
+  # it was included in a previous commit if you are interested.
 DATA = TRAINING_DATA
 
 class genetic_specimin:
@@ -163,7 +163,6 @@ def simulate_generation(genetic_pool_l = genetic_pool):
       subject.score_rms()
     elif SCORE_METHOD == "WORST_GUESS":
       subject.score_worst_guess()
-    #This code doesn't look great but python doesn't have a switch and enums were less readable.
     avg_scores_this_round += subject.score
   avg_scores_this_round /= len(genetic_pool_l)
 
@@ -192,7 +191,8 @@ def simulate_generation(genetic_pool_l = genetic_pool):
   ):
     df += 1 
     stag_avg = [0] * len(stag_avg)
-    # only one to avoid random mistakes, 
+    # This is done to avoid the DF being increased several times in a row. 
+    # This code was later removed from the c++ version
     
     print("DivisionFactor increased")
 
@@ -217,7 +217,8 @@ def simulate_generation(genetic_pool_l = genetic_pool):
     if (subject.score < avg_scores_this_round): 
       genetic_pool_l.remove(subject)  
       # if the generation is really bad keep some parents, 
-        # reduces poor performace at the start
+        # reduces poor performace at the start, also removed from the c++ version as
+          # generations happen so quickly this became less noticable
   
   genetic_pool_l += children # let them grow up
   generation += 1 #for debugging and visualisation, not used in code.
@@ -227,6 +228,9 @@ def generations(n, genetic_pool_l = genetic_pool):
   global generation    
   def init_pool(genetic_pool_l):  
     global CtoF
+    
+    # This detects a reoccuring problem where the score would simply refuse to decrease
+      # It didn't happen in the c++ implemtaion so I assume there is a bug in here somewhere or it is caused by floating point error
     for i in range(25):
       genetic_pool_l = simulate_generation(genetic_pool_l)  
       
