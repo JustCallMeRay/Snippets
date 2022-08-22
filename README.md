@@ -11,7 +11,8 @@ I chose to organise snippets in this way as to have more control (and organisati
 
 ### Machine Learning (on python and C++) 
 Built as a learning experiance in pyhton during a 2 hour code dojo, then in C++, this code finds a ax^2 + bx + c equation, defined by a given set of training data. <br>
-Based on (real world) testing, the algorithm runs with O(n) time complexity (n being generations) with 6000 generations using about two seconds of CPU time (on replit), compared to the pyhton implentaion, where 50 generations took 8 to 9 seconds (again on replit), after graphing the data (comming soon) I determined  6000 generations would take about 17 minutes 🐌.   
+Based on (real world) testing, the algorithm runs with O(n) time complexity (n being generations) with 6000 generations using about two seconds of CPU time (on replit), compared to the pyhton implentaion, where 50 generations took 8 to 9 seconds (again on replit), after graphing the data (comming soon) I determined  6000 generations would take about 17 minutes 🐌. <br>
+Interestingly very few bugs / issues where shared between the two implementations, for example the c++ version was "unlearning" (caused by an order of operations issue involving modulos in the reproduce method) which was something which had not occured in the pyhton version. In comparison the python version seems to fall into a "running away" cycle where the score only ever increases.
 
 
 <br>
